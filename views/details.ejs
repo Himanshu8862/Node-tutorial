@@ -12,9 +12,26 @@
                     <%= blog.body %>
                 </p>
             </div>
+                <!-- data-<something> is used to add custom attributed to tags which can be accessed later using dataset.something  -->
             <a class="delete" data-doc="<%= blog._id %>">Delete</a>
         </div>
         <%- include("./partials/footer.ejs") %>
+
+        <script>
+            const trashcan = document.querySelector('a.delete');
+
+            trashcan.addEventListener('click', (e) => {
+                const endpoint = `/blogs/${trashcan.dataset.doc}`;
+
+                fetch(endpoint, {
+                    method: 'DELETE',
+                })
+                    .then(response => response.json())
+                    .then(data => window.location.href = data.redirectTo) // use the json object to redirect to home page
+                    .catch(err => console.log(err));
+            });
+
+        </script>
     </body>
 
 </html>
