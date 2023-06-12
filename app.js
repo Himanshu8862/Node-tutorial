@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan")
 const mongoose = require("mongoose")
 require('dotenv').config();
-const Blog = require("./models/blog")
+const blogRouter = require("./routes/blogRoutes")
 
 // instance of express app
 const app = express();
@@ -113,53 +113,7 @@ app.get('/about', (req, res) => {
 
 
 // blog routes
-app.get("/blogs", (req, res) => {
-    Blog.find().sort({ "createdAt": -1 })
-        .then((result) => {
-            res.render("index", { title: "All blogs", blogs: result })
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-})
-
-app.post("/blogs", (req, res) => {
-    // console.log(req.body)
-    const blog = new Blog(req.body)
-    blog.save()
-        .then((result) => {
-            res.redirect("/blogs");
-        }).catch((err) => {
-            console.log(err);
-        })
-})
-
-app.get("/blogs/:id", (req,res)=>{
-    Blog.findById(req.params.id)
-    .then((result)=>{
-        res.render("details", {blog:result, title:"Blog details "})
-    })
-    .catch((err)=>{
-        console.log(err)
-    })
-})
-
-app.delete("/blogs/:id", (req,res)=>{
-    const id = req.params.id;
-
-    Blog.findByIdAndDelete(id)
-        .then((result)=>{
-            res.json({redirectTo: "/blogs"}) // have to return a json object to the frontend
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
-});
-
-app.get("/blogs/create", (req, res) => {
-    res.render("create", { title: "Create a new blog" })
-})
-
+app.use("/blogs",blogRouter);
 
 // 404 page
 // use function will get fired for every request regardless of the url, only if the request reaches this point of the code
