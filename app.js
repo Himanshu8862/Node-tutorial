@@ -1,8 +1,36 @@
 const express = require("express");
 const morgan = require("morgan")
+const mongoose = require("mongoose")
+require('dotenv').config();
+const Blog = require("./models/blog")
 
 // instance of express app
 const app = express();
+
+// connect to mongoDB
+// it is an async task, so it returns a promise
+mongoose.connect(process.env.DB_URI)
+    .then(() => {
+        console.log("connected to DB");
+        // listen for requests
+        app.listen(3000, () => {
+            console.log("Listening at port 3000")
+        })
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+
+// const dbConnect = async() =>{
+//     try{
+//         await mongoose.connect(process.env.DB_URI);
+//         console.log("DB has connected successfully");
+//     } catch(error){
+//         console.log(error.message);
+//         process.exit(1);
+//     }
+// }
+// dbConnect();
 
 // register view engine, it will look into "views" folder - to insert dynamic values in html and much more
 app.set("view engine", "ejs");
@@ -28,6 +56,42 @@ app.set("view engine", "ejs");
 // ---static files ---
 // setting up our static files, pass in here a folder name for example "public" and that means that if I create a folder called public then anything inside that folder is going to be made available as a static file to the front-end
 app.use(express.static("public"))
+
+
+// mongoose sandbox routes
+app.get("/add-blog", (req, res) => {
+    const blog = new Blog({
+        title: "new blog 2",
+        snippet: "about my new blog",
+        body: "evem more about my new blog"
+    })
+    blog.save()
+        .then((result) => {
+            res.send(result);
+        }).catch((err) => {
+            console.log(err);
+        })
+})
+
+app.get("/all-blogs", (req, res) => {
+    Blog.find()
+        .then((value) => {
+            res.send(value);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+})
+
+app.get("/single-blog", (req, res) => {
+    Blog.findById("6486fed9bac3695f4ec292b7")
+        .then((value) => {
+            res.send(value);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+})
 
 
 // respond with "home page" when a GET request is made to the homepage
@@ -57,7 +121,3 @@ app.use((req, res) => {
 })
 
 
-// listen for requests
-app.listen(3000, () => {
-    console.log("Listening at port 3000")
-})
