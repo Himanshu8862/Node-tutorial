@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan")
 
 // instance of express app
 const app = express();
@@ -7,6 +8,26 @@ const app = express();
 app.set("view engine", "ejs");
 // app.set("views", "myViews")
 
+
+// middleware
+// app.use((req, res, next) => {
+//     console.log('new request made:');
+//     console.log('host: ', req.hostname);
+//     console.log('path: ', req.path);
+//     console.log('method: ', req.method);
+//     next();
+// });
+
+// app.use((req, res, next) => {
+//     console.log('in the next middleware');
+//     next();
+// });
+
+// app.use(morgan("dev"))
+
+// ---static files ---
+// setting up our static files, pass in here a folder name for example "public" and that means that if I create a folder called public then anything inside that folder is going to be made available as a static file to the front-end
+app.use(express.static("public"))
 
 
 // respond with "home page" when a GET request is made to the homepage
